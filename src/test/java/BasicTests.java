@@ -26,8 +26,11 @@ public class BasicTests {
 		Employee employee1 = new Employee();
 		employee1.setName("alice");
 		employee1.setRole(EmployeeRole.BENCO_AND_DEPT_HEAD);
+		employee1.setPassword("bar");
+		employee1.setSuperuser(true);
 		Employee employee2 = new Employee();
 		employee2.setName("bob");
+		employee2.setPassword("bar");
 		employee2.setRole(EmployeeRole.NORMAL);
 		Employee employee3 = new Employee();
 
@@ -52,6 +55,8 @@ public class BasicTests {
 			request.setEmployeeID(employee2ID);
 			Timestamp timestamp = Timestamp.valueOf(LocalDateTime.now());
 			request.setTimestamp(timestamp);
+			Timestamp eventTime = Timestamp.valueOf(LocalDateTime.of(2020, 11, 12, 10, 0));
+			request.setEventTime(eventTime);
 			request.setLocation("Springfield");
 			request.setDescription("Party time");
 			request.setAmount(2.5);

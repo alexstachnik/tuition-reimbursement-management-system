@@ -39,7 +39,8 @@ public class SQL_DB implements DBInterface {
 		String username;
 		if (this.conn == null) {
 			try {
-				//Class.forName("oracle.jdbc.driver.OracleDriver");
+				Class.forName("oracle.jdbc.driver.OracleDriver");
+				DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 				Properties props = new Properties();
 				FileInputStream input = new FileInputStream(SQL_DB.class.getClassLoader().getResource("connection.properties").getFile());
 				props.load(input);
@@ -61,6 +62,7 @@ public class SQL_DB implements DBInterface {
 		try {
 			if (this.conn != null) {
 				this.conn.close();
+				this.conn = null;
 			}
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Error disconnecting from db",e);
@@ -86,20 +88,20 @@ public class SQL_DB implements DBInterface {
 			int id = getNewId();
 			
 			PreparedStatement stmt = conn.prepareStatement(
-					"insert into requests (id,employee,time,location,description,amount,gradingformat,mingrade,typeofevent,justification,worktimemissed,status) values (?,?,?,?,?,?,?,?,?,?,?,?)");
+					"insert into requests (id,employee,time,eventTime,location,description,amount,gradingformat,mingrade,typeofevent,justification,worktimemissed,status) values (?,?,?,?,?,?,?,?,?,?,?,?,?)");
 			stmt.setInt(1,id);
 			stmt.setInt(2, request.getEmployeeID());
 			stmt.setTimestamp(3, request.getTimestamp());
-			stmt.setString(4, request.getLocation());
-			stmt.setString(5, request.getDescription());
-			stmt.setDouble(6,request.getAmount());
-			stmt.setString(7,request.getGradingFormat().toString());
-			stmt.setString(8,request.getMinGrade());
-			stmt.setString(9,request.getEventType().toString());
-			stmt.setString(10,request.getJustification());
-			stmt.setString(11, request.getWorkTimeMissed());
-			stmt.setString(12, request.getStatus().toString());
-			System.out.println(request);
+			stmt.setTimestamp(4, request.getEventTime());
+			stmt.setString(5, request.getLocation());
+			stmt.setString(6, request.getDescription());
+			stmt.setDouble(7,request.getAmount());
+			stmt.setString(8,request.getGradingFormat().toString());
+			stmt.setString(9,request.getMinGrade());
+			stmt.setString(10,request.getEventType().toString());
+			stmt.setString(11,request.getJustification());
+			stmt.setString(12, request.getWorkTimeMissed());
+			stmt.setString(13, request.getStatus().toString());
 			stmt.execute();
 			
 			return id;
@@ -111,7 +113,7 @@ public class SQL_DB implements DBInterface {
 	@Override
 	public BenefitsRequest lookupRequest(int requestID) throws TRMSSQLException {
 		try {
-			PreparedStatement stmt = conn.prepareStatement("select employee,time,location,description,amount,gradingformat,mingrade,typeofevent,justification,worktimemissed,status from requests where id=?");
+			PreparedStatement stmt = conn.prepareStatement("select employee,time,eventTime,location,description,amount,gradingformat,mingrade,typeofevent,justification,worktimemissed,status from requests where id=?");
 			stmt.setInt(1, requestID);
 			ResultSet rs = stmt.executeQuery();
 			if (!rs.next()) {
@@ -121,15 +123,16 @@ public class SQL_DB implements DBInterface {
 			retval.setRequestID(requestID);
 			retval.setEmployeeID(rs.getInt(1));
 			retval.setTimestamp(rs.getTimestamp(2));
-			retval.setLocation(rs.getString(3));
-			retval.setDescription(rs.getString(4));
-			retval.setAmount(rs.getDouble(5));
-			retval.setGradingFormat(GradingFormat.valueOf(rs.getString(6)));
-			retval.setMinGrade(rs.getString(7));
-			retval.setEventType(EventType.valueOf(rs.getString(8)));
-			retval.setJustification(rs.getString(9));
-			retval.setWorkTimeMissed(rs.getString(10));
-			retval.setStatus(RequestStatus.valueOf(rs.getString(11)));
+			retval.setEventTime(rs.getTimestamp(3));
+			retval.setLocation(rs.getString(4));
+			retval.setDescription(rs.getString(5));
+			retval.setAmount(rs.getDouble(6));
+			retval.setGradingFormat(GradingFormat.valueOf(rs.getString(7)));
+			retval.setMinGrade(rs.getString(8));
+			retval.setEventType(EventType.valueOf(rs.getString(9)));
+			retval.setJustification(rs.getString(10));
+			retval.setWorkTimeMissed(rs.getString(11));
+			retval.setStatus(RequestStatus.valueOf(rs.getString(12)));
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup request",e);
@@ -141,10 +144,12 @@ public class SQL_DB implements DBInterface {
 	public int createEmployee(Employee employee) throws TRMSSQLException {
 		try {
 			int id = getNewId();
-			PreparedStatement stmt = conn.prepareStatement("insert into employees (id,name,role) values (?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("insert into employees (id,name,role,passwordHash,isSuperuser) values (?,?,?,?,?)");
 			stmt.setInt(1, id);
 			stmt.setString(2, employee.getName());
 			stmt.setString(3,employee.getRole().toString());
+			stmt.setString(4, employee.getPasswordHash());
+			stmt.setInt(5,employee.isSuperuser()?1:0);
 			stmt.execute();
 			return id;
 		} catch (SQLException e) {
@@ -156,7 +161,7 @@ public class SQL_DB implements DBInterface {
 	public Employee lookupEmployee(int employeeID) throws TRMSSQLException {
 		try {
 			Employee retval = new Employee();
-			PreparedStatement stmt = conn.prepareStatement("select name,role from employees where id=?");
+			PreparedStatement stmt = conn.prepareStatement("select name,role,passwordHash,isSuperuser from employees where id=?");
 			stmt.setInt(1, employeeID);
 			ResultSet rs = stmt.executeQuery();
 			if (!rs.next()) {
@@ -165,6 +170,8 @@ public class SQL_DB implements DBInterface {
 			retval.setEmployeeID(employeeID);
 			retval.setName(rs.getString(1));
 			retval.setRole(EmployeeRole.valueOf(rs.getString(2)));
+			retval.setPasswordHash(rs.getString(3));
+			retval.setSuperuser(rs.getInt(4)==1);
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup employee",e);
@@ -392,6 +399,26 @@ public class SQL_DB implements DBInterface {
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not get presentations",e);
+		}
+	}
+
+	@Override
+	public Employee lookupEmployeeByName(String username) throws TRMSSQLException {
+		try {
+			Employee retval = new Employee();
+			PreparedStatement stmt=conn.prepareStatement("select id,role,passwordHash,issuperuser from Employees where name=?");
+			stmt.setString(1, username);
+			ResultSet rs = stmt.executeQuery();
+			if (!rs.next()) {
+				return null;
+			}
+			retval.setEmployeeID(rs.getInt(1));
+			retval.setRole(EmployeeRole.valueOf(rs.getString(2)));
+			retval.setPasswordHash(rs.getString(3));
+			retval.setSuperuser(rs.getInt(4)==1);
+			return retval;
+		} catch (SQLException e) {
+			throw new TRMSSQLException("Could not look up employee", e);
 		}
 	}
 	

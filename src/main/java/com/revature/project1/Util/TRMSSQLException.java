@@ -1,6 +1,6 @@
 package com.revature.project1.Util;
 
-public class TRMSSQLException extends Exception {
+public class TRMSSQLException extends TRMSException {
 
 	public TRMSSQLException() {
 		super();

@@ -7,6 +7,7 @@ public class BenefitsRequest {
 	private int employeeID;
 	private Timestamp timestamp;
 	
+	private Timestamp eventTime;
 	private String location;
 	private String description;
 	private double amount;
@@ -17,12 +18,22 @@ public class BenefitsRequest {
 	private String workTimeMissed;
 	private RequestStatus status;
 
+
 	@Override
 	public String toString() {
 		return "BenefitsRequest [requestID=" + requestID + ", employeeID=" + employeeID + ", timestamp=" + timestamp
-				+ ", location=" + location + ", description=" + description + ", amount=" + amount + ", gradingFormat="
-				+ gradingFormat + ", minGrade=" + minGrade + ", eventType=" + eventType + ", justification="
-				+ justification + ", workTimeMissed=" + workTimeMissed + ", status=" + status + "]";
+				+ ", eventTime=" + eventTime + ", location=" + location + ", description=" + description + ", amount="
+				+ amount + ", gradingFormat=" + gradingFormat + ", minGrade=" + minGrade + ", eventType=" + eventType
+				+ ", justification=" + justification + ", workTimeMissed=" + workTimeMissed + ", status=" + status
+				+ "]";
+	}
+
+	public Timestamp getEventTime() {
+		return eventTime;
+	}
+
+	public void setEventTime(Timestamp eventTime) {
+		this.eventTime = eventTime;
 	}
 
 	public BenefitsRequest() {

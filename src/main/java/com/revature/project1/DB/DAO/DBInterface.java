@@ -11,11 +11,16 @@ import com.revature.project1.Util.TRMSSQLException;
 
 public interface DBInterface {
 	
+	// Indempotent
 	void connect() throws TRMSSQLException;
 	
 	void disconnect() throws TRMSSQLException;
 	
-	int createRequest(BenefitsRequest request) throws TRMSSQLException ;
+	Employee lookupEmployeeByName(String username) throws TRMSSQLException;
+	
+	int createRequest(BenefitsRequest request) throws TRMSSQLException;
+	
+	List<Integer> lookupAllRequestIDs() throws TRMSSQLException;
 	
 	BenefitsRequest lookupRequest(int requestID) throws TRMSSQLException ;
 	
