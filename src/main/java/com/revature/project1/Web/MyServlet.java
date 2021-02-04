@@ -1,4 +1,4 @@
-package com.revature.project1;
+package com.revature.project1.Web;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,10 +37,14 @@ public class MyServlet extends HttpServlet {
     }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getWriter().append("Served baz Hi at: ").append(request.getContextPath());
-		HttpSession sess = request.getSession();
-		System.out.println(sess.getId());
-		System.out.println("get");
+		switch (request.getRequestURI()) {
+		case "/project1/getAllRequests.do":
+			getAllRequests(request,response);
+			break;
+		default:
+			response.sendRedirect("/project1/error-404.jsp");
+			break;
+		}
 	}
 	
 	private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -85,7 +89,7 @@ public class MyServlet extends HttpServlet {
 		response.getWriter().append("Success");
 	}
 	
-	void printAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	void getAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		SessionManager sm = SessionManager.getSessionManager();
 		try {
 			List<BenefitsRequest> requests = sm.getAllBenefitRequests();
@@ -108,9 +112,6 @@ public class MyServlet extends HttpServlet {
 			break;
 		case "/project1/request.do":
 			handleBenefitsRequest(request,response);
-			break;
-		case "/project1/allRequests.do":
-			printAllRequests(request,response);
 			break;
 		default:
 			response.sendRedirect("/project1/error-404.jsp");

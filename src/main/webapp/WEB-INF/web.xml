@@ -6,12 +6,12 @@
 	<display-name>Archetype Created Web Application</display-name>
 	<servlet>
 		<servlet-name>MyServlet</servlet-name>
-		<servlet-class>com.revature.project1.MyServlet</servlet-class>
+		<servlet-class>com.revature.project1.Web.MyServlet</servlet-class>
 	</servlet>
 	
 	<filter>
 		<filter-name>AuthFilter</filter-name>
-		<filter-class>com.revature.project1.AuthFilter</filter-class>
+		<filter-class>com.revature.project1.Web.AuthFilter</filter-class>
 	</filter>
 
 	<filter-mapping>

@@ -1,4 +1,4 @@
-package com.revature.project1;
+package com.revature.project1.Web;
 
 import java.io.IOException;
 import javax.servlet.Filter;

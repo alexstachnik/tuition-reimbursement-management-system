@@ -19,19 +19,49 @@
         crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../static/css/common.css">
     <link rel="stylesheet" href="../static/css/approvals.css">
+    <script src="js/approvals.js"></script>
 	<link rel="icon" href="../static/imgs/favicon-16x16.png">
 </head>
-<body>
+<body onload="main()">
 
 
 <jsp:include page="navbar.jsp">
 <jsp:param name="curpage" value="approvals" />
 </jsp:include>
 
-<div id="content">
-         Approvals
-
+<div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="mainModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Blank</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+<div id="content">
+		<div id="requestDiv">
+			<table class="table table-hover" id="requestTable">
+				<thead>
+					<th scope="col">Id</th>
+					<th scope="col">Amount</th>
+					<th scope="col">Description</th>
+				</thead>
+				<tbody id="requestTableBody">
+				</tbody>
+			</table>
+		</div>
+
+	</div>
  
 
 
