@@ -2,6 +2,8 @@ package com.revature.project1.DB.types;
 
 import java.sql.Timestamp;
 
+import org.json.JSONObject;
+
 public class BenefitsRequest {
 	private int requestID;
 	private int employeeID;
@@ -19,6 +21,34 @@ public class BenefitsRequest {
 	private RequestStatus status;
 
 
+	public JSONObject toJson() {
+		JSONObject retval = new JSONObject();
+		retval.put("requestID", this.requestID);
+		retval.put("employeeID", this.employeeID);
+		if (this.timestamp != null) {
+			retval.put("timestamp", this.timestamp.toLocalDateTime().toString());
+		}
+		if (this.eventTime != null) {
+			retval.put("eventTime",eventTime.toLocalDateTime().toString());
+		}
+		retval.put("location",this.location);
+		retval.put("description", this.description);
+		retval.put("amount",this.amount);
+		if (this.gradingFormat != null) {
+			retval.put("GradingFormat", this.gradingFormat.toString());
+		}
+		retval.put("minGrade", this.minGrade);
+		if (this.eventType != null) {
+			retval.put("eventType", this.eventType.toString());
+		}
+		retval.put("justification", this.justification);
+		retval.put("workTimeMissed", this.workTimeMissed);
+		if (this.status != null) {
+			retval.put("status", this.status.toString());
+		}
+		return retval;
+	}
+	
 	@Override
 	public String toString() {
 		return "BenefitsRequest [requestID=" + requestID + ", employeeID=" + employeeID + ", timestamp=" + timestamp

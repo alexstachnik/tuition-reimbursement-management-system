@@ -3,6 +3,7 @@ package com.revature.project1.Sessions;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -30,8 +31,14 @@ public class SessionManager {
 		logInTimes = new HashMap<String,LocalDateTime>();
 	}
 	
-	public BenefitsRequest getAllBenefitRequests() {
-		return null;
+	
+	public List<BenefitsRequest> getAllBenefitRequests() throws TRMSWebSafeException {
+		try {
+			return serviceManager.getAllBenefitRequests();
+		} catch (TRMSException e) {
+			e.printStackTrace();
+			throw new TRMSWebSafeException("Error looking up benefit requests");
+		}
 	}
 	
 	public void createBenefitsRequest(String session, String requestStr) throws TRMSWebSafeException {

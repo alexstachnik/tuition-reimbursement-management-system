@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -16,9 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.math3.util.MultidimensionalCounter.Iterator;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.revature.project1.DB.types.BenefitsRequest;
 import com.revature.project1.Sessions.SessionManager;
 import com.revature.project1.Util.TRMSException;
 import com.revature.project1.Util.TRMSWebSafeException;
@@ -82,9 +85,20 @@ public class MyServlet extends HttpServlet {
 		response.getWriter().append("Success");
 	}
 	
-	void printAllRequests(HttpServletRequest request, HttpServletResponse response) {
+	void printAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		SessionManager sm = SessionManager.getSessionManager();
-		
+		try {
+			List<BenefitsRequest> requests = sm.getAllBenefitRequests();
+			JSONArray requestArray= new JSONArray();
+			for (int i=0;i<requests.size();++i) {
+				requestArray.put(requests.get(i).toJson());
+			}
+			response.getWriter().append(requestArray.toString(1));
+		} catch (TRMSWebSafeException e) {
+			response.setStatus(400);
+			response.getWriter().append(e.getMessage());
+			return;
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
