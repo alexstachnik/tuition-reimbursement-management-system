@@ -109,6 +109,21 @@ public class SQL_DB implements DBInterface {
 			throw new TRMSSQLException("Could not create benefits request",e);
 		}
 	}
+	
+	@Override
+	public List<Integer> lookupAllRequestIDs() throws TRMSSQLException {
+		try {
+			List<Integer> retval = new ArrayList<Integer>();
+			PreparedStatement stmt = conn.prepareStatement("select id from requests");
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				retval.add(rs.getInt(1));
+			}
+			return retval;
+		} catch (SQLException e) {
+			throw new TRMSSQLException("Could not get IDs",e);
+		}
+	}
 
 	@Override
 	public BenefitsRequest lookupRequest(int requestID) throws TRMSSQLException {

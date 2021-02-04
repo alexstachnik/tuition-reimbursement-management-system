@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.JSONException;
+
 import com.revature.project1.Sessions.SessionManager;
 
 /**
@@ -49,7 +51,14 @@ public class AuthFilter implements Filter {
 		}
 		
 		HttpSession sess = hreq.getSession();
-		SessionManager sessionManager = SessionManager.getSessionManager();
+		SessionManager sessionManager=null;
+		try {
+			System.out.println("running");
+			sessionManager = SessionManager.getSessionManager();
+		} catch (JSONException e) {
+			e.printStackTrace();
+			System.out.println("Uhoh");
+		}
 		if (sessionManager.isLoggedIn(sess.getId())) {
 			chain.doFilter(request, response);
 		} else if (

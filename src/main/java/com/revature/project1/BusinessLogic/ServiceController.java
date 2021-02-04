@@ -2,6 +2,8 @@ package com.revature.project1.BusinessLogic;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.revature.project1.DB.DAO.DBInterface;
 import com.revature.project1.DB.DAO.SQL_DB;
@@ -28,6 +30,16 @@ public class ServiceController {
 		int requestID=db.createRequest(br);
 		br.setRequestID(requestID);
 		return br;
+	}
+	
+	public List<BenefitsRequest> getAllBenefitRequests() throws TRMSException {
+		db.connect();
+		List<Integer> ids = db.lookupAllRequestIDs();
+		List<BenefitsRequest> retval = new ArrayList<BenefitsRequest>();
+		for (int i=0;i<ids.size();++i) {
+			retval.add(db.lookupRequest(ids.get(i)));
+		}
+		return retval;
 	}
 	
 	public User checkCredentials(String username, String password) throws TRMSException {
