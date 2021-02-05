@@ -46,6 +46,9 @@ public class MyServlet extends HttpServlet {
 		case "/project1/s/employeeMap.do":
 			getEmployeeMap(request,response);
 			break;
+		case "/project1/s/getRequest.do":
+			getBenefitsRequest(request, response);
+			break;
 		default:
 			response.sendError(404);
 			break;
@@ -123,7 +126,7 @@ public class MyServlet extends HttpServlet {
 		response.getWriter().append("Success");
 	}
 	
-	void getAllRequests(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	void getAllRequests(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		SessionManager sm = SessionManager.getSessionManager();
 		try {
 			List<BenefitsRequest> requests = sm.getAllBenefitRequests();
@@ -133,8 +136,31 @@ public class MyServlet extends HttpServlet {
 			}
 			response.getWriter().append(requestArray.toString(1));
 		} catch (TRMSWebSafeException e) {
-			response.setStatus(400);
-			response.getWriter().append(e.getMessage());
+			printError(request, response, e);
+			return;
+		}
+	}
+	
+	private void getBenefitsRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException {
+		SessionManager sm = SessionManager.getSessionManager();
+		int requestID=0;
+		try {
+			String requestIDStr = request.getParameter("requestID");
+			requestID=Integer.parseInt(requestIDStr);
+		} catch (NumberFormatException e) {
+			response.sendError(400);
+			return;
+		}
+		try {
+			BenefitsRequest br = sm.lookupBenefitsRequest(requestID);
+			if (br == null) {
+				response.sendError(400);
+				return;
+			} else {
+				response.getWriter().append(br.toJson().toString(1));
+			}
+		} catch (TRMSWebSafeException e) {
+			printError(request, response, e);
 			return;
 		}
 	}

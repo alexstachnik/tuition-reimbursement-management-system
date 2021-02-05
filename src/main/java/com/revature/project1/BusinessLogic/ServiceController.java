@@ -52,6 +52,11 @@ public class ServiceController {
 		}
 		return sum;
 	}
+	
+	public BenefitsRequest lookupBenefitsRequest(int requestID) throws TRMSException {
+		db.connect();
+		return db.lookupRequest(requestID);
+	}
 
 	public Employee lookupEmployee(int employeeID) throws TRMSException {
 		db.connect();

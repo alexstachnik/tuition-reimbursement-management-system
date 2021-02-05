@@ -44,12 +44,14 @@ function displayList(requests,filterResults) {
 			modalTable.append(subrow);
 		}
 		
+		var cleanTimestamp="";
 		if (typeof(timestamp) == "string") {
 			let timestampParts=timestamp.split(":")
-			var cleanTimestamp=timestampParts[0]+":"+timestampParts[1]
+			cleanTimestamp=timestampParts[0]+":"+timestampParts[1]
 		}
+		var cleanEventTime="";
 		if (typeof(eventTime) == "string") {
-			var cleanEventTime=eventTime.split("T")[0];
+			cleanEventTime=eventTime.split("T")[0];
 		}
 		
 
@@ -101,9 +103,7 @@ function displayList(requests,filterResults) {
 }
 
 function approve() {
-	console.log("approve" + currentRequest);
-	document.getElementById("approvalButton").setAttribute("disabled",true);
-	document.getElementById("approvalButton").innerText="Approved";
+	window.location.href="/project1/s/approve.jsp?requestID="+currentRequest;
 }
 
 var approvalList;

@@ -29,7 +29,7 @@
 <link rel="icon" href="../static/imgs/favicon-16x16.png">
 
 </head>
-<body>
+<body onload="main()">
 
 
 	<jsp:include page="navbar.jsp">
@@ -173,6 +173,13 @@
 				<div class="input" id="work-time-missed-input">
 					<input inputmode="text"></input>
 				</div>
+			</div></div>
+
+			<div class="field"><div>
+			<div class="label"><label>Estimated Reimbursement</label></div>
+			<div class="output">
+				$<input type="number" id="reimbursementOutput" disabled="disabled" value="0.00"></input>
+			</div>
 			</div></div>
 
 		<button id="submit-button" type="button" class="btn btn-primary" onclick="submit()">Submit</button>

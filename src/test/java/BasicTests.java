@@ -113,17 +113,19 @@ public class BasicTests {
 			
 			Approval approval = new Approval();
 			approval.setApprovalDate(Timestamp.valueOf(LocalDateTime.now()));
-			approval.setApprovalType(ApprovalType.BENCO);
+			approval.setApprovalType(ApprovalType.DENY);
 			approval.setPreApproval(false);
+			approval.setAuthID(employee5ID);
 			approval.setRequestID(requestID);
 			int approvalID=db.addApproval(approval);
 			System.out.println(approvalID);
 			
 			Approval approval2 = new Approval();
 			approval2.setApprovalDate(Timestamp.valueOf(LocalDateTime.now()));
-			approval2.setApprovalType(ApprovalType.BENCO);
+			approval2.setApprovalType(ApprovalType.APPROVE);
 			approval2.setFileReference(fileID);
 			approval2.setPreApproval(true);
+			approval2.setAuthID(employee1ID);
 			approval2.setRequestID(requestID);
 			int approvalID2=db.addApproval(approval2);
 			System.out.println(approvalID2);

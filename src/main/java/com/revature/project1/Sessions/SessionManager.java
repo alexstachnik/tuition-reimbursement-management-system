@@ -146,6 +146,16 @@ public class SessionManager {
 			throw new TRMSWebSafeException("Error looking up reimbursements",500);
 		}
 	}
+	
+	public BenefitsRequest lookupBenefitsRequest(int requestID) throws TRMSWebSafeException {
+		try {
+			BenefitsRequest request = serviceManager.lookupBenefitsRequest(requestID);
+			return request;
+		} catch (TRMSException e) {
+			e.printStackTrace();
+			throw new TRMSWebSafeException("Error retrieving benefits request",500);
+		}
+	}
 
 	public boolean login(String sessionId, String username, String password) throws TRMSWebSafeException {
 		try {

@@ -76,9 +76,10 @@ public class SQL_DB implements DBInterface {
 			if (!idrs.next()) {
 				throw new TRMSSQLException("Could not get new id number");
 			}
+			int newid=idrs.getInt(1);
 			idrs.close();
 			idStmt.close();
-			return idrs.getInt(1);
+			return newid;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not fetch new id number",e);
 		}
@@ -270,11 +271,13 @@ public class SQL_DB implements DBInterface {
 	public int addApproval(Approval approval) throws TRMSSQLException {
 		try {
 			int id = getNewId();
-			PreparedStatement stmt = conn.prepareStatement("insert into approvals (id,requestid,approvaldate,approvaltype) values (?,?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("insert into approvals (id,requestid,approvaldate,approvaltype,amount,authid) values (?,?,?,?,?,?)");
 			stmt.setInt(1, id);
 			stmt.setInt(2, approval.getRequestID());
 			stmt.setTimestamp(3, approval.getApprovalDate());
 			stmt.setString(4, approval.getApprovalType().toString());
+			stmt.setDouble(5, approval.getApprovalAmt());
+			stmt.setInt(6, approval.getAuthID());
 			stmt.execute();
 			if (approval.isPreApproval()) {
 				addPreapproval(id, approval.getFileReference());
@@ -290,7 +293,7 @@ public class SQL_DB implements DBInterface {
 	public List<Approval> getApprovals(int requestID) throws TRMSSQLException {
 		try {
 			List<Approval> retval = new ArrayList<Approval>();
-			PreparedStatement stmt = conn.prepareStatement("select id,approvaldate,approvaltype from approvals where requestid=?");
+			PreparedStatement stmt = conn.prepareStatement("select id,approvaldate,approvaltype,amount,authid from approvals where requestid=?");
 			stmt.setInt(1, requestID);
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
@@ -300,6 +303,8 @@ public class SQL_DB implements DBInterface {
 				approval.setApprovalID(approvalID);
 				approval.setApprovalDate(rs.getTimestamp(2));
 				approval.setApprovalType(ApprovalType.valueOf(rs.getString(3)));
+				approval.setApprovalAmt(rs.getDouble(4));
+				approval.setAuthID(rs.getInt(5));
 				
 				PreparedStatement stmt2 = conn.prepareStatement("select fileID from preapprovals where approvalid=?");
 				stmt2.setInt(1, approvalID);
@@ -426,9 +431,10 @@ public class SQL_DB implements DBInterface {
 			if (!rs.next()) {
 				return null;
 			}
+			String grade=rs.getString(1);
 			rs.close();
 			stmt.close();
-			return rs.getString(1);
+			return grade;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup grade",e);
 		}

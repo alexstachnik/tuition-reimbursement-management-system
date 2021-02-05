@@ -5,12 +5,30 @@ import java.sql.Timestamp;
 public class Approval {
 
 	private int approvalID;
+	private int authID;
 	private int requestID;
 	private Timestamp approvalDate;
 	private ApprovalType approvalType;
+	private double approvalAmt;
 	private int fileReference;
 	public boolean isPreApproval;
 	
+	public int getAuthID() {
+		return authID;
+	}
+
+	public void setAuthID(int authID) {
+		this.authID = authID;
+	}
+	
+	public double getApprovalAmt() {
+		return approvalAmt;
+	}
+
+	public void setApprovalAmt(double approvalAmt) {
+		this.approvalAmt = approvalAmt;
+	}
+
 	public boolean isPreApproval() {
 		return isPreApproval;
 	}
@@ -58,10 +76,13 @@ public class Approval {
 
 	@Override
 	public String toString() {
-		return "Approval [approvalID=" + approvalID + ", requestID=" + requestID + ", approvalDate=" + approvalDate
-				+ ", approvalType=" + approvalType + ", fileReference=" + fileReference + ", isPreApproval="
-				+ isPreApproval + "]";
+		return "Approval [approvalID=" + approvalID + ", authID=" + authID + ", requestID=" + requestID
+				+ ", approvalDate=" + approvalDate + ", approvalType=" + approvalType + ", approvalAmt=" + approvalAmt
+				+ ", fileReference=" + fileReference + ", isPreApproval=" + isPreApproval + "]";
 	}
+
+
+
 
 	
 }
