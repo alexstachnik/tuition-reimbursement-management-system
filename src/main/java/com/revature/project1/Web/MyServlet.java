@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.revature.project1.DB.types.BenefitsRequest;
+import com.revature.project1.DB.types.Employee;
 import com.revature.project1.Sessions.SessionManager;
 import com.revature.project1.Util.TRMSException;
 import com.revature.project1.Util.TRMSWebSafeException;
@@ -38,12 +40,45 @@ public class MyServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		switch (request.getRequestURI()) {
-		case "/project1/getAllRequests.do":
+		case "/project1/s/getAllRequests.do":
 			getAllRequests(request,response);
 			break;
-		default:
-			response.sendRedirect("/project1/error-404.jsp");
+		case "/project1/s/employeeMap.do":
+			getEmployeeMap(request,response);
 			break;
+		default:
+			response.sendError(404);
+			break;
+		}
+	}
+	
+	private void printError(HttpServletRequest request, HttpServletResponse response, TRMSWebSafeException e) throws IOException, ServletException {
+		response.setStatus(e.getErrorCode());
+		response.getWriter().append(e.getMessage());
+	}
+	
+	private void getEmployeeMap(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		SessionManager sessionManager = SessionManager.getSessionManager();
+		String employeeIDstr = request.getParameter("employeeID");
+		int employeeID=0;
+		try {
+			employeeID=Integer.parseInt(employeeIDstr);
+		} catch (NumberFormatException e) {
+			e.printStackTrace();
+			response.sendError(500);
+		}
+		try {
+			Employee employee = sessionManager.lookupEmployee(employeeID);
+			if (employee == null) {
+				throw new TRMSWebSafeException("No such employee");
+			}
+			JSONObject json = new JSONObject();
+			json.append("name", employee.getName());
+			json.append("role", employee.getRole());
+			response.getWriter().append(json.toString(1));
+		} catch (TRMSWebSafeException e) {
+			printError(request,response,e);
+			return;
 		}
 	}
 	
@@ -53,7 +88,7 @@ public class MyServlet extends HttpServlet {
 		String username=request.getParameter("username");
 		String password=request.getParameter("password");
 		if (username == null || password == null) {
-			response.sendRedirect("/project1/error-400.jsp");
+			response.sendError(400);
 		}
 		if (sessionManager.isLoggedIn(sess.getId())) {
 			response.sendRedirect("/project1/s/");
@@ -65,14 +100,14 @@ public class MyServlet extends HttpServlet {
 				} else {
 					response.sendRedirect("/project1/index.jsp?loginFailed=true");
 				}
-			} catch (TRMSException e) {
-				e.printStackTrace();
-				response.sendRedirect("/project1/error-500.jsp");
+			} catch (TRMSWebSafeException e) {
+				printError(request, response, e);
+				return;
 			}
 		}
 	}
 	
-	private void handleBenefitsRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void handleBenefitsRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		BufferedReader br = request.getReader();
 		String sess = request.getSession().getId();
 		String body = br.lines().collect(Collectors.joining());
@@ -80,8 +115,7 @@ public class MyServlet extends HttpServlet {
 		try {
 			sm.createBenefitsRequest(sess,body);
 		} catch (TRMSWebSafeException e) {
-			response.setStatus(400);
-			response.getWriter().append(e.getMessage());
+			printError(request, response, e);
 			return;
 		}
 		
@@ -110,11 +144,11 @@ public class MyServlet extends HttpServlet {
 		case "/project1/login.do":
 			login(request,response);
 			break;
-		case "/project1/request.do":
+		case "/project1/s/request.do":
 			handleBenefitsRequest(request,response);
 			break;
 		default:
-			response.sendRedirect("/project1/error-404.jsp");
+			response.sendError(404);
 			break;
 		}
 		

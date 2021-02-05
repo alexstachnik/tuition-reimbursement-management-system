@@ -29,6 +29,28 @@
 <jsp:param name="curpage" value="approvals" />
 </jsp:include>
 
+
+<div id="content">
+		<div class="form-check form-switch">
+  			<input class="form-check-input" type="checkbox" id="approvedRequestsCheckbox">
+  			<label class="form-check-label" for="flexSwitchCheckDefault">Show Approved Requests</label>
+		</div>
+
+
+		<div id="requestDiv">
+			<table class="table table-hover" id="requestTable">
+				<thead>
+					<th scope="col">Id</th>
+					<th scope="col">Amount</th>
+					<th scope="col">Description</th>
+				</thead>
+				<tbody id="requestTableBody">
+				</tbody>
+			</table>
+		</div>
+
+</div>
+
 <div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="mainModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -43,26 +65,11 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        <button type="button" id="approvalButton" class="btn btn-secondary" onclick="approve()">Approve</button>
       </div>
     </div>
   </div>
 </div>
-
-<div id="content">
-		<div id="requestDiv">
-			<table class="table table-hover" id="requestTable">
-				<thead>
-					<th scope="col">Id</th>
-					<th scope="col">Amount</th>
-					<th scope="col">Description</th>
-				</thead>
-				<tbody id="requestTableBody">
-				</tbody>
-			</table>
-		</div>
-
-	</div>
- 
 
 
 </body>

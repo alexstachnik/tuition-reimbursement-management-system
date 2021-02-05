@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import com.revature.project1.BusinessLogic.ServiceController;
 import com.revature.project1.DB.types.BenefitsRequest;
+import com.revature.project1.DB.types.Employee;
 import com.revature.project1.DB.types.EventType;
 import com.revature.project1.DB.types.GradingFormat;
 import com.revature.project1.Util.TRMSException;
@@ -31,13 +32,21 @@ public class SessionManager {
 		logInTimes = new HashMap<String,LocalDateTime>();
 	}
 	
+	public Employee lookupEmployee(int employeeID) throws TRMSWebSafeException {
+		try {
+			return serviceManager.lookupEmployee(employeeID);
+		} catch (TRMSException e) {
+			e.printStackTrace();
+			throw new TRMSWebSafeException("Error looking up employee",500);
+		}
+	}
 	
 	public List<BenefitsRequest> getAllBenefitRequests() throws TRMSWebSafeException {
 		try {
 			return serviceManager.getAllBenefitRequests();
 		} catch (TRMSException e) {
 			e.printStackTrace();
-			throw new TRMSWebSafeException("Error looking up benefit requests");
+			throw new TRMSWebSafeException("Error looking up benefit requests",500);
 		}
 	}
 	
@@ -48,7 +57,7 @@ public class SessionManager {
 			
 			String[] dateElts = json.getString("eventdate").split("-");
 			if (dateElts.length != 3) {
-				throw new TRMSWebSafeException("Error parsing date");
+				throw new TRMSWebSafeException("Error parsing date",400);
 			}
 			LocalDateTime eventDate;
 			try {
@@ -57,7 +66,7 @@ public class SessionManager {
 				int day = Integer.parseInt(dateElts[2]);
 				eventDate = LocalDateTime.of(year, month, day, 0, 0);
 			} catch (NumberFormatException e) {
-				throw new TRMSWebSafeException("Error parsing date");
+				throw new TRMSWebSafeException("Error parsing date",400);
 			}
 			Timestamp eventTimestamp = Timestamp.valueOf(eventDate);
 			br.setEventTime(eventTimestamp);
@@ -76,7 +85,7 @@ public class SessionManager {
 			try {
 				format=GradingFormat.valueOf(gradingFormatStr);
 			} catch (IllegalArgumentException e) {
-				throw new TRMSWebSafeException("Error parsing grading format");
+				throw new TRMSWebSafeException("Error parsing grading format",400);
 			}
 			br.setGradingFormat(format);
 			
@@ -88,7 +97,7 @@ public class SessionManager {
 			try {
 				eventType=EventType.valueOf(eventTypeStr);
 			} catch (IllegalArgumentException e) {
-				throw new TRMSWebSafeException("Error parsing event type");
+				throw new TRMSWebSafeException("Error parsing event type",400);
 			}
 			br.setEventType(eventType);
 			
@@ -103,10 +112,10 @@ public class SessionManager {
 			System.out.println(br);
 		} catch (JSONException e) {
 			e.printStackTrace();
-			throw new TRMSWebSafeException("Internal error parsing JSON");
+			throw new TRMSWebSafeException("Error parsing JSON",400);
 		} catch (TRMSException e) {
 			e.printStackTrace();
-			throw new TRMSWebSafeException("Error creating benefits request");
+			throw new TRMSWebSafeException("Error creating benefits request",500);
 		}
 
 	}
@@ -128,16 +137,29 @@ public class SessionManager {
 			return user.isSuperuser();
 		}
 	}
+	
+	public double totalReimbursement(int employeeID) throws TRMSWebSafeException {
+		try {
+			return serviceManager.totalReimbursement(employeeID);
+		} catch (TRMSException e) {
+			e.printStackTrace();
+			throw new TRMSWebSafeException("Error looking up reimbursements",500);
+		}
+	}
 
-	public boolean login(String sessionId, String username, String password) throws TRMSException {
-		User user = serviceManager.checkCredentials(username, password);
-
-		if (user == null) {
-			return false;
-		} else {
-			loggedInUsers.put(sessionId,user);
-			logInTimes.put(sessionId, LocalDateTime.now());
-			return true;
+	public boolean login(String sessionId, String username, String password) throws TRMSWebSafeException {
+		try {
+			User user = serviceManager.checkCredentials(username, password);
+			if (user == null) {
+				return false;
+			} else {
+				loggedInUsers.put(sessionId,user);
+				logInTimes.put(sessionId, LocalDateTime.now());
+				return true;
+			}
+		} catch (TRMSException e) {
+			e.printStackTrace();
+			throw new TRMSWebSafeException("Error checking credentials",500);
 		}
 	}
 	

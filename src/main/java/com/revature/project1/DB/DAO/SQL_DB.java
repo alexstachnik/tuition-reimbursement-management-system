@@ -76,6 +76,8 @@ public class SQL_DB implements DBInterface {
 			if (!idrs.next()) {
 				throw new TRMSSQLException("Could not get new id number");
 			}
+			idrs.close();
+			idStmt.close();
 			return idrs.getInt(1);
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not fetch new id number",e);
@@ -103,7 +105,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setString(12, request.getWorkTimeMissed());
 			stmt.setString(13, request.getStatus().toString());
 			stmt.execute();
-			
+			stmt.close();
 			return id;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not create benefits request",e);
@@ -133,6 +135,8 @@ public class SQL_DB implements DBInterface {
 			retval.setJustification(rs.getString(10));
 			retval.setWorkTimeMissed(rs.getString(11));
 			retval.setStatus(RequestStatus.valueOf(rs.getString(12)));
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup request",e);
@@ -149,6 +153,26 @@ public class SQL_DB implements DBInterface {
 			while (rs.next()) {
 				retval.add(rs.getInt(1));
 			}
+			rs.close();
+			stmt.close();
+			return retval;
+		} catch (SQLException e) {
+			throw new TRMSSQLException("Could not get IDs",e);
+		}
+	}
+	
+	@Override
+	public List<Integer> lookupAllRequestsByEmployee(int employeeID) throws TRMSSQLException {
+		try {
+			List<Integer> retval = new ArrayList<Integer>();
+			PreparedStatement stmt = conn.prepareStatement("select id from requests where employee=?");
+			stmt.setInt(1, employeeID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				retval.add(rs.getInt(1));
+			}
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not get IDs",e);
@@ -166,6 +190,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setString(4, employee.getPasswordHash());
 			stmt.setInt(5,employee.isSuperuser()?1:0);
 			stmt.execute();
+			stmt.close();
 			return id;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not create employee",e);
@@ -187,6 +212,8 @@ public class SQL_DB implements DBInterface {
 			retval.setRole(EmployeeRole.valueOf(rs.getString(2)));
 			retval.setPasswordHash(rs.getString(3));
 			retval.setSuperuser(rs.getInt(4)==1);
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup employee",e);
@@ -200,6 +227,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setInt(1, employeeID);
 			stmt.setInt(2, managerID);
 			stmt.execute();
+			stmt.close();
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not set manager",e);
 		}
@@ -215,7 +243,10 @@ public class SQL_DB implements DBInterface {
 			if (!rs.next()) {
 				return -1;
 			}
-			return rs.getInt(1);
+			int retval=rs.getInt(1);
+			rs.close();
+			stmt.close();
+			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup manager",e);
 		}
@@ -248,6 +279,7 @@ public class SQL_DB implements DBInterface {
 			if (approval.isPreApproval()) {
 				addPreapproval(id, approval.getFileReference());
 			}
+			stmt.close();
 			return id;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not insert approval",e);
@@ -276,8 +308,12 @@ public class SQL_DB implements DBInterface {
 					approval.setPreApproval(true);
 					approval.setFileReference(rs2.getInt(1));
 				}
+				rs2.close();
+				stmt2.close();
 				retval.add(approval);
 			}
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not get approval list",e);
@@ -301,6 +337,7 @@ public class SQL_DB implements DBInterface {
 			os.flush();
 			stmt.setBlob(4,blob);
 			stmt.execute();
+			stmt.close();
 			return id;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not upload attachment",e);
@@ -322,6 +359,8 @@ public class SQL_DB implements DBInterface {
 			retval.setFileID(fileID);
 			retval.setRequestID(rs.getInt(1));
 			retval.setFiletype(rs.getString(2));
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not fetch metadata",e);
@@ -343,6 +382,8 @@ public class SQL_DB implements DBInterface {
 			retval.setFiletype(rs.getString(2));
 			Blob blob = rs.getBlob(3);
 			retval.setFiledata(blob.getBytes(1,(int) blob.length()));
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not fetch file",e);
@@ -356,6 +397,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setInt(1, approvalID);
 			stmt.setInt(2, fileid);
 			stmt.execute();
+			stmt.close();
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not insert preapproval",e);
 		}
@@ -368,6 +410,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setInt(1, requestID);
 			stmt.setString(2, grade);
 			stmt.execute();
+			stmt.close();
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not set grade",e);
 		}
@@ -383,6 +426,8 @@ public class SQL_DB implements DBInterface {
 			if (!rs.next()) {
 				return null;
 			}
+			rs.close();
+			stmt.close();
 			return rs.getString(1);
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not lookup grade",e);
@@ -396,6 +441,7 @@ public class SQL_DB implements DBInterface {
 			stmt.setInt(1, requestID);
 			stmt.setInt(2, fileID);
 			stmt.execute();
+			stmt.close();
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not add presentation",e);
 		}
@@ -411,6 +457,8 @@ public class SQL_DB implements DBInterface {
 			while (rs.next()) {
 				retval.add(rs.getInt(1));
 			}
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not get presentations",e);
@@ -431,6 +479,8 @@ public class SQL_DB implements DBInterface {
 			retval.setRole(EmployeeRole.valueOf(rs.getString(2)));
 			retval.setPasswordHash(rs.getString(3));
 			retval.setSuperuser(rs.getInt(4)==1);
+			rs.close();
+			stmt.close();
 			return retval;
 		} catch (SQLException e) {
 			throw new TRMSSQLException("Could not look up employee", e);

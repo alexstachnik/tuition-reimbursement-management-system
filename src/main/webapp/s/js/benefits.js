@@ -93,7 +93,7 @@
 		}
 		document.getElementById("submit-button").setAttribute("disabled",true);
 		xhttp=new XMLHttpRequest();
-		xhttp.open("POST","/project1/request.do");
+		xhttp.open("POST","/project1/s/request.do");
 		xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 		xhttp.onreadystatechange= function () {
 			if (xhttp.readyState == 4) {

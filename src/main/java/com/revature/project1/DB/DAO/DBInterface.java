@@ -52,5 +52,7 @@ public interface DBInterface {
 	void addPresentation(int requestID, int fileID) throws TRMSSQLException ;
 	
 	List<Integer> getPresentations(int requestID) throws TRMSSQLException;
+	
+	List<Integer> lookupAllRequestsByEmployee(int employeeID) throws TRMSSQLException;
 
 }

@@ -41,7 +41,22 @@ public class ServiceController {
 		}
 		return retval;
 	}
+	
+	public double totalReimbursement(int employeeID) throws TRMSException {
+		db.connect();
+		double sum=0.0;
+		List<Integer> requestIDs=db.lookupAllRequestsByEmployee(employeeID);
+		for (Integer id:requestIDs) {
+			BenefitsRequest request = db.lookupRequest(id);
+			sum += request.getAmount();
+		}
+		return sum;
+	}
 
+	public Employee lookupEmployee(int employeeID) throws TRMSException {
+		db.connect();
+		return db.lookupEmployee(employeeID);
+	}
 	
 	public User checkCredentials(String username, String password) throws TRMSException {
 		db.connect();
