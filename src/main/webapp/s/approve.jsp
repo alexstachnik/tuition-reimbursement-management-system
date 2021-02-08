@@ -24,18 +24,58 @@
 </head>
 <body onload="main()">
 
-
+<%@page import="java.util.List"%>
+<%@page import="com.revature.project1.Sessions.SessionManager"%>
+<%
+	String closeDisabled="disabled";
+	SessionManager sessionManager = SessionManager.getSessionManager();
+	if (sessionManager.isBenco(session.getId())) {
+		closeDisabled="";
+	}
+%>
 
 
 <jsp:include page="navbar.jsp">
 <jsp:param name="curpage" value="approval" />
 </jsp:include>
 
-<label>Reimbursement amount: </label><input id="reimbursementAmt" type="number"></input><br/>
-<button type="button" class="btn btn-primary">Approve</button>
-<button type="button" class="btn btn-secondary">Deny</button>
-
+<label>Reimbursement amount: </label><input id="reimbursementAmt" type="number"></input><br />
+<div id="buttons">
+	<button type="button" class="btn btn-primary" onclick="approve()">Approve</button>
+	<button type="button" class="btn btn-danger" onclick="deny()">Deny</button>
+	<button type="button" class="btn btn-secondary" <%= closeDisabled %> onclick="closeReq()">Close</button>
+</div>
+<div id="statusLabels">
+</div>
 <div id="content">
+	<div id="otherData">
+		<ul id="otherDataList">
+		<%
+		int requestID=Integer.parseInt(request.getParameter("requestID"));
+		String grade = sessionManager.getGrade(requestID);
+		if (grade != null) {
+			out.println("<li>Grade: "+grade+"</li>");
+		}
+		
+		List<String> links=sessionManager.getPresentations(requestID);
+		for (int i=0;i<links.size();++i) {
+			out.println("<li><a href=\""+links.get(i)+"\">Presentation File</a></li>");
+		}
+		
+		if (sessionManager.employeeHasApproved(request.getSession().getId(), requestID)) {
+			out.println("<li>You have approved this request</li>");
+		}
+		
+		if (sessionManager.isBencoApproved(requestID)) {
+			out.println("<li>The Benco has approved this");
+		}
+		
+		if (sessionManager.isBossApproved(requestID)) {
+			out.println("<li>Either the employees direct supervisor or dept. head has approved this</li>");
+		}
+		%>
+		</ul>
+	</div>
 	<div id="requestInfoDiv">
 		<table class="table" id="requestInfoTable">
 		</table>

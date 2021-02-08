@@ -492,6 +492,18 @@ public class SQL_DB implements DBInterface {
 			throw new TRMSSQLException("Could not look up employee", e);
 		}
 	}
+
+	@Override
+	public void closeRequest(int requestID) throws TRMSSQLException {
+		try {
+			PreparedStatement stmt=conn.prepareStatement("update requests set status='CLOSED' where id=?");
+			stmt.setInt(1, requestID);
+			stmt.execute();
+			stmt.close();
+		} catch (SQLException e) {
+			throw new TRMSSQLException("Could not close request",e);
+		}
+	}
 	
 
 }

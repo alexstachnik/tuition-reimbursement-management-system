@@ -3,3 +3,12 @@
 #requestInfoDiv {
 	width:600px;
 }
+
+#buttons {
+	float: left;
+	padding-right:50px;
+}
+
+#otherData {
+	border-style: inset;
+}

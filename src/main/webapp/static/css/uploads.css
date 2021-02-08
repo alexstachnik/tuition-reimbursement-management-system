@@ -1,0 +1,10 @@
+@charset "ISO-8859-1";
+.pagebox {
+	border-style: inset;
+	width: 600px;
+	margin-bottom: 50px;
+}
+
+.modal-button {
+	margin: 20px;
+}

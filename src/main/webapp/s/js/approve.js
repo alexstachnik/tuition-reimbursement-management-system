@@ -3,6 +3,45 @@
  */
 
 var table;
+var requestID;
+
+function sendResults(params) {
+	let xhttp = new XMLHttpRequest();
+	xhttp.open("POST","/project1/s/approve.do");
+	xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhttp.onreadystatechange=function () {
+		if (this.readyState==4) {
+			if (this.status==200) {
+				window.location.href="/project1/s/approvals.jsp";
+			}
+		}
+	}
+	xhttp.send(params);
+}
+
+function approve() {
+	requestAmt=document.getElementById("reimbursementAmt").value;
+	sendResults("approvalType=APPROVE&requestID="+requestID+"&requestAmt="+requestAmt);
+}
+
+function deny() {
+	requestAmt=document.getElementById("reimbursementAmt").value;
+	sendResults("approvalType=DENY&requestID="+requestID+"&requestAmt="+requestAmt);
+}
+
+function closeReq() {
+	let xhttp = new XMLHttpRequest();
+	xhttp.open("POST","/project1/s/close.do");
+	xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhttp.onreadystatechange=function () {
+		if (this.readyState==4) {
+			if (this.status==200) {
+				window.location.href="/project1/s/approvals.jsp";
+			}
+		}
+	}
+	xhttp.send("requestID="+requestID);
+}
 
 function displayInfo(request) {
 	let gradingFormat=request["GradingFormat"];
@@ -17,6 +56,7 @@ function displayInfo(request) {
 	let status= request["status"];
 	let eventTime = request["eventTime"];
 	let timestamp = request["timestamp"];
+	let totalReimbursement = request["totalReimbursement"];
 	
 	let eventTypeValues={	"SEMINAR": 0.6,
 							"UNIVERSITY_COURSE": 0.8,
@@ -29,6 +69,8 @@ function displayInfo(request) {
 		amountModifier=eventTypeValues[eventType];
 	}
 	modifiedAmount=amountModifier*amount;
+	
+	let remainingBalance = (1000.0-totalReimbursement)+amount;
 	
 	var cleanTimestamp="";
 	if (typeof(timestamp) == "string") {
@@ -55,6 +97,7 @@ function displayInfo(request) {
 	
 	addRow("Reimbursement Amount ($)",modifiedAmount.toFixed(2));
 	addRow("Amount ($)",amount.toFixed(2));
+	addRow("Remaining Balance ($)", remainingBalance.toFixed(2));
 	addRow("Description",description);
 	addRow("Grading format",gradingFormat);
 	addRow("Employee Name",employeeName);
@@ -64,6 +107,18 @@ function displayInfo(request) {
 	addRow("Minimum Grade",minGrade);
 	addRow("Event Date",cleanEventTime);
 	addRow("Time when request was made", cleanTimestamp);
+	
+	let statusLabelsElt=document.getElementById("statusLabels");
+	if (status == "CLOSED") {
+		let closedElt=document.createElement("span");
+		statusLabelsElt.appendChild(closedElt);
+		closedElt.innerText="Closed";
+	}
+	if (status == "OPEN") {
+		let openElt=document.createElement("span");
+		statusLabelsElt.appendChild(openElt);
+		openElt.innerText="Open";
+	}
 }
 
 function lookupEmployee(request) {
@@ -85,7 +140,7 @@ function lookupEmployee(request) {
 function main() {
 	table=document.getElementById("requestInfoTable");
 	let url = new URL(window.location.href);
-	let requestID = url.searchParams.get('requestID');
+	requestID = url.searchParams.get('requestID');
 	if (requestID == null) {
 		return;
 	}

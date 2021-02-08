@@ -25,21 +25,26 @@ public class BasicTests {
 		SQL_DB db = new SQL_DB();
 		Employee employee1 = new Employee();
 		employee1.setName("alice");
-		employee1.setRole(EmployeeRole.BENCO_AND_DEPT_HEAD);
+		employee1.setRole(EmployeeRole.BENCO);
 		employee1.setPassword("bar");
 		employee1.setSuperuser(true);
+		
 		Employee employee2 = new Employee();
 		employee2.setName("bob");
 		employee2.setPassword("bar");
 		employee2.setRole(EmployeeRole.NORMAL);
+		
 		Employee employee3 = new Employee();
-
+		
 		Employee employee4 = new Employee();
 		employee4.setName("charlie");
+		employee4.setPassword("bar");
 		employee4.setRole(EmployeeRole.NORMAL);
+		
 		Employee employee5 = new Employee();
 		employee5.setName("dan");
-		employee5.setRole(EmployeeRole.NORMAL);
+		employee5.setPassword("bar");
+		employee5.setRole(EmployeeRole.DEPT_HEAD);
 		
 		
 		try {

@@ -9,6 +9,17 @@
 		<servlet-class>com.revature.project1.Web.MyServlet</servlet-class>
 	</servlet>
 	
+	<servlet>
+		<servlet-name>UploadServlet</servlet-name>
+		<servlet-class>com.revature.project1.Web.UploadServlet</servlet-class>
+		<multipart-config>
+    		<location>C:/tmp</location>
+		    <max-file-size>20848820</max-file-size>
+		    <max-request-size>418018841</max-request-size>
+		    <file-size-threshold>1048576</file-size-threshold>
+		</multipart-config>
+	</servlet>
+	
 	<filter>
 		<filter-name>AuthFilter</filter-name>
 		<filter-class>com.revature.project1.Web.AuthFilter</filter-class>
@@ -48,6 +59,10 @@
 	<servlet-mapping>
 		<servlet-name>MyServlet</servlet-name>
 		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>UploadServlet</servlet-name>
+		<url-pattern>/s/upload.post</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>default</servlet-name>

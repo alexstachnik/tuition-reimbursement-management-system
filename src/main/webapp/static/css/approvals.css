@@ -3,3 +3,12 @@
 #requestDiv {
 	width: 800px;
 }
+
+#approvedRequestsDiv {
+	float: left;
+	padding-right: 50px;
+}
+
+#closedRequestsDiv {
+	float: left;
+}

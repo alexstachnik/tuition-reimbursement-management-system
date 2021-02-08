@@ -7,6 +7,7 @@
 	String messagesActive="";
 	String approvalsActive="";
 	String adminActive="";
+	String uploadsActive="";
 	switch (curpage) {
 	case "requests":
 		requestsActive="active";
@@ -19,6 +20,9 @@
 		break;
 	case "admin":
 		adminActive="active";
+		break;
+	case "uploads":
+		uploadsActive="active";
 		break;
 	default:
 		break;
@@ -44,6 +48,8 @@
 			<a class="nav-item nav-link <%=messagesActive%>" href="/project1/s/messages.jsp"> Messages </a>
 			<a class="nav-item nav-link <%=approvalsActive%>" href="/project1/s/approvals.jsp">Approvals</a>
 			<a class="nav-item nav-link <%=adminActive%> <%=adminDisabled%>" href="/project1/s/useradmin.jsp">User Admin</a>
+			<a class="nav-item nav-link <%=uploadsActive%>" href="/project1/s/uploads.jsp">Uploads</a>
+			<a class="nav-item nav-link" href="/project1/logout.do">Log out</a>
 		</div>
 	</div>
 </nav>

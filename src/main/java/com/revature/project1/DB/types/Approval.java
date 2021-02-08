@@ -38,6 +38,7 @@ public class Approval {
 	}
 
 	public Approval() {
+		super();
 		
 	}
 	

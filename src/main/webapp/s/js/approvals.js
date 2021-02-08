@@ -2,12 +2,24 @@
  * 
  */
 
-function displayList(requests,filterResults) {
+function displayList(requests) {
 	let tbody=document.getElementById("requestTableBody");
 	tbody.innerHTML="";
+	
+	filterClosed=true;
+	if (document.getElementById("closedRequestsCheckbox").checked) {
+		filterClosed=false;
+	}
+	filterApproved=true;
+	if (document.getElementById("approvedRequestsCheckbox").checked) {
+		filterApproved=false;
+	}
 		
 	for (i=requests.length-1;i>=0;--i) {
-		if (filterResults && requests[i].status == "CLOSED") {
+		if (filterClosed && requests[i].status == "CLOSED") {
+			continue;
+		}
+		if (filterApproved && requests[i].employeeHasApproved) {
 			continue;
 		}
 		let row=document.createElement("tr");
@@ -18,6 +30,12 @@ function displayList(requests,filterResults) {
 		row.appendChild(amountField);
 		row.appendChild(descField);
 		tbody.appendChild(row);
+		
+		if (requests[i].status == "CLOSED") {
+			row.classList.add("table-dark");
+		} else if (requests[i].employeeHasApproved) {
+			row.classList.add("table-danger");
+		}
 
 		let gradingFormat=requests[i]["GradingFormat"];
 		let amount=requests[i]["amount"];
@@ -28,7 +46,6 @@ function displayList(requests,filterResults) {
 		let eventLocation = requests[i]["location"];
 		let minGrade = requests[i]["minGrade"];
 		let id=requests[i]['requestID'];
-		let status= requests[i]["status"];
 		let eventTime = requests[i]["eventTime"];
 		let timestamp = requests[i]["timestamp"];
 		
@@ -61,14 +78,6 @@ function displayList(requests,filterResults) {
 		
 		let popupModal = function (employeeName) {
 			currentRequest=id;
-			
-			if (status == "OPEN") {
-				document.getElementById("approvalButton").removeAttribute("disabled");
-				document.getElementById("approvalButton").innerText="Approve";		
-			} else {
-				document.getElementById("approvalButton").setAttribute("disabled",true);
-				document.getElementById("approvalButton").innerText="Approved";
-			}
 			document.getElementById("modalTitle").innerText="Benefit Request "+id;
 			document.getElementById("modalBody").innerHTML="";
 			document.getElementById("modalBody").appendChild(modalTable);
@@ -111,11 +120,11 @@ var currentRequest;
 
 function main() {
 	document.getElementById("approvedRequestsCheckbox").onchange=function() {
-		if (this.checked) {
-			displayList(approvalList,false);
-		} else {
-			displayList(approvalList,true);
-		}
+		displayList(approvalList);
+	}
+	
+	document.getElementById("closedRequestsCheckbox").onchange=function() {
+		displayList(approvalList);
 	}
 	
 	let xhttp = new XMLHttpRequest();

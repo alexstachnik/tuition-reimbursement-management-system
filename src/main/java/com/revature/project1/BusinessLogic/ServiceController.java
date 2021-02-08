@@ -1,5 +1,6 @@
 package com.revature.project1.BusinessLogic;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,8 +8,12 @@ import java.util.List;
 
 import com.revature.project1.DB.DAO.DBInterface;
 import com.revature.project1.DB.DAO.SQL_DB;
+import com.revature.project1.DB.types.Approval;
+import com.revature.project1.DB.types.ApprovalType;
+import com.revature.project1.DB.types.Attachment;
 import com.revature.project1.DB.types.BenefitsRequest;
 import com.revature.project1.DB.types.Employee;
+import com.revature.project1.DB.types.EmployeeRole;
 import com.revature.project1.DB.types.RequestStatus;
 import com.revature.project1.Util.TRMSException;
 import com.revature.project1.Util.User;
@@ -42,6 +47,46 @@ public class ServiceController {
 		return retval;
 	}
 	
+	public int uploadAttachment(Attachment attachment, InputStream istream) throws TRMSException {
+		db.connect();
+		return db.uploadAttachment(attachment, istream);
+	}
+	
+	public Attachment fetchAttachment(int attachmentID) throws TRMSException {
+		db.connect();
+		return db.fetchAttachment(attachmentID);
+	}
+	
+	public List<Integer> getPresentations(int requestID) throws TRMSException {
+		db.connect();
+		return db.getPresentations(requestID);
+	}
+	
+	public void setGrade(int requestID, String grade) throws TRMSException {
+		db.connect();
+		db.setGrade(requestID, grade);
+	}
+	
+	public void closeRequest(int requestID) throws TRMSException {
+		db.connect();
+		db.closeRequest(requestID);
+	}
+	
+	public String getGrade(int requestID) throws TRMSException {
+		db.connect();
+		return db.lookupGrade(requestID);
+	}
+	
+	public void addPresentation(int requestID, int fileID) throws TRMSException {
+		db.connect();
+		db.addPresentation(requestID, fileID);
+	}
+	
+	public void addPreapproval(Approval approval) throws TRMSException {
+		db.connect();
+		db.addApproval(approval);
+	}
+	
 	public double totalReimbursement(int employeeID) throws TRMSException {
 		db.connect();
 		double sum=0.0;
@@ -51,6 +96,60 @@ public class ServiceController {
 			sum += request.getAmount();
 		}
 		return sum;
+	}
+	
+	public boolean employeeHasApproved(int employeeID, int requestID) throws TRMSException {
+		db.connect();
+		List<Approval> approvals=db.getApprovals(requestID);
+		for (Approval approval : approvals) {
+			if (	(approval.getAuthID() == employeeID) &&
+					(approval.getApprovalType() == ApprovalType.APPROVE)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public boolean isBencoApproved(int requestID) throws TRMSException {
+		db.connect();
+		List<Approval> approvals=db.getApprovals(requestID);
+		for (Approval approval : approvals) {
+			if (approval.getApprovalType() == ApprovalType.APPROVE) {
+				Employee authEmployee = db.lookupEmployee(approval.getAuthID());
+				if (	(authEmployee.getRole() == EmployeeRole.BENCO) ||
+						(authEmployee.getRole() == EmployeeRole.BENCO_AND_DEPT_HEAD)) {
+					return true;
+				}
+				
+			}
+		}
+		return false;
+	}
+	
+	public boolean isBossApproved(int requestID) throws TRMSException {
+		db.connect();
+		BenefitsRequest br=db.lookupRequest(requestID);
+		int employeeID=br.getEmployeeID();
+		int bossID = db.lookupManager(employeeID);
+		
+		List<Approval> approvals=db.getApprovals(requestID);
+		for (Approval approval : approvals) {
+			if (approval.getApprovalType() == ApprovalType.APPROVE) {
+				Employee authEmployee = db.lookupEmployee(approval.getAuthID());
+				if (authEmployee.getRole() == EmployeeRole.DEPT_HEAD) {
+					return true;
+				}
+				if (authEmployee.getEmployeeID() == bossID) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public void addApproval(Approval approval) throws TRMSException {
+		db.connect();
+		db.addApproval(approval);
 	}
 	
 	public BenefitsRequest lookupBenefitsRequest(int requestID) throws TRMSException {
